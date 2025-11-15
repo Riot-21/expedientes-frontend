@@ -3,7 +3,9 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "../login/store/auth.store";
+import { CustomFullScreenLoading } from "../custom/CustomFullScreenLoading";
 
+//"middleware" extra
 export default function ProtectedPage({
   children,
 }: {
@@ -14,18 +16,18 @@ export default function ProtectedPage({
 
   useEffect(() => {
     checkAuth();
-  }, [checkAuth]);
+  }, []);
 
   useEffect(() => {
     if (!isChecked) return;
 
     if (authStatus === "not-authenticated" || !token) {
-      router.push("/login");
+      router.replace("/login");
     }
   }, [isChecked, authStatus, token, router]);
 
   if (!isChecked || authStatus === "checking") {
-    return <div>Cargando...</div>;
+    return <CustomFullScreenLoading></CustomFullScreenLoading>;
   }
 
   return <>{children}</>;

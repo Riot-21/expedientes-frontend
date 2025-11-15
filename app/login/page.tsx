@@ -1,38 +1,35 @@
 "use client";
 
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "./store/auth.store";
 import { toast } from "sonner";
-
-const loginSchema = z.object({
-  email: z.email("Email inválido").nonempty("El correo es obligatorio"),
-  password: z.string().nonempty("La contraseña es obligatoria").min(8, "La contraseña debe tener mínimo 8 caracteres"),
-});
-
-type LoginForm = z.infer<typeof loginSchema>;
+import { LoginForm, loginSchema } from "./interfaces/schemas.interface";
 
 export default function LoginPage() {
   const router = useRouter();
+  //funcion login del store
   const { login } = useAuthStore();
 
+  //formulario de tipo loginform y validado con el schema loginSchema
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<LoginForm>({ resolver: zodResolver(loginSchema),
-    mode: "onTouched"
-   });
+  } = useForm<LoginForm>({
+    resolver: zodResolver(loginSchema),
+    mode: "onTouched",
+  });
 
+  //handler para login
   const onSubmit = async (data: LoginForm) => {
     const isValid = await login(data.email, data.password);
     if (isValid) {
       router.push("/home");
       return;
     }
-    toast.error("Correo y/o contraseña incorrectos")
+    toast.error("Correo y/o contraseña incorrectos");
   };
 
   return (
@@ -50,7 +47,7 @@ export default function LoginPage() {
             <input
               type="email"
               {...register("email", {
-                required: true
+                required: true,
               })}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="tucorreo@ejemplo.com"
@@ -68,7 +65,7 @@ export default function LoginPage() {
             <input
               type="password"
               {...register("password", {
-                required: true
+                required: true,
               })}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Ingrese su contraseña"
@@ -80,7 +77,6 @@ export default function LoginPage() {
             )}
           </div>
 
-          {/* Botón */}
           <button
             type="submit"
             disabled={isSubmitting}

@@ -19,10 +19,17 @@ import { useDeleteExp } from "./hooks/useDeleteExp";
 import ProtectedPage from "../providers/ProtectedPage";
 
 export default function page() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentId, setCurrentId] = useState<string | null>(null)
-  const { logout, authStatus, token } = useAuthStore();
+  //States para modal de editar y id actual
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [currentId, setCurrentId] = useState<string | null>(null);
+
+  //funcion logout del store
+  const { logout } = useAuthStore();
+
+  //custom hook para listar los expedientes
   const { data } = useExpediente();
+
+  //custom hooks para create, update y delete
   const { mutation: create } = useCreateExpediente();
   const { mutation: update } = useUpdateExp();
   const { mutation: deleteExp } = useDeleteExp();
@@ -42,51 +49,13 @@ export default function page() {
   const {
     register: registerEdit,
     handleSubmit: handleSubmitEdit,
-    formState: { errors: errorsEdit },
+    formState: { errors: errorsEdit, isSubmitting: isEditSubmitting },
     reset: resetEdit,
   } = useForm<EditForm>({
     resolver: zodResolver(editSchema),
   });
 
-  const openEditModal = (expediente: EditForm, id: string) => {
-    resetEdit(expediente);
-    setCurrentId(id)
-    setIsModalOpen(true);
-  };
-
-
-  const onEditSubmit = async(data: EditForm) => {
-    console.log("ID:", currentId);
-console.log("DATOS:", data);
-console.log("URL:", `/expediente/${currentId}`);
-    if(!currentId){
-      toast.error("no se encontro el id")
-      return
-    }
-    await update.mutateAsync({id: currentId, datos: data}, {
-      onSuccess: () => {
-        toast.success("Producto editado correctamente"), 
-        resetEdit(), 
-        setIsModalOpen(false),
-        setCurrentId(null);
-      },
-      onError: () => {
-        toast.error("Error al editar expediente");
-      },
-    })
-  };
-
-  const handleDelete = async (id: string) => {
-    await deleteExp.mutateAsync(id, {
-      onSuccess: () => {
-        toast.success("Producto eliminado correctamente"), resetCreate();
-      },
-      onError: () => {
-        toast.error("Error al eliminar expediente");
-      },
-    });
-  };
-
+  // handler para el post de expediente
   const onCreateSubmit = async (data: ExpedienteForm) => {
     await create.mutateAsync(data, {
       onSuccess: () => {
@@ -98,9 +67,46 @@ console.log("URL:", `/expediente/${currentId}`);
     });
   };
 
-  // if (authStatus == "not-authenticated" || !token) {
-  //   redirect("/login");
-  // }
+  // handler para abrir el modal de editar con el expediente especifico
+  const openEditModal = (expediente: EditForm, id: string) => {
+    resetEdit(expediente);
+    setCurrentId(id);
+    setIsModalOpen(true);
+  };
+
+  // handler para mandar patch
+  const onEditSubmit = async (data: EditForm) => {
+    if (!currentId) {
+      toast.error("no se encontro el id");
+      return;
+    }
+    await update.mutateAsync(
+      { id: currentId, datos: data },
+      {
+        onSuccess: () => {
+          toast.success("Producto editado correctamente"),
+            resetEdit(),
+            setIsModalOpen(false),
+            setCurrentId(null);
+        },
+        onError: () => {
+          toast.error("Error al editar expediente");
+        },
+      }
+    );
+  };
+
+  //handler para borrar un expediente
+  const handleDelete = async (id: string) => {
+    await deleteExp.mutateAsync(id, {
+      onSuccess: () => {
+        toast.success("Producto eliminado correctamente"), resetCreate();
+      },
+      onError: () => {
+        toast.error("Error al eliminar expediente");
+      },
+    });
+  };
 
   return (
     <ProtectedPage>
@@ -118,16 +124,17 @@ console.log("URL:", `/expediente/${currentId}`);
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Formulario */}
+          {/* formulario */}
           <section className="bg-white rounded-xl shadow p-6 col-span-1">
             <h2 className="text-xl font-semibold mb-4">Crear expediente</h2>
 
+            {/* Formulario para crear expediente */}
             <form
               onSubmit={handleSubmitCreate(onCreateSubmit)}
               className="space-y-4"
             >
               <div>
-                <label className="font-medium">Título</label>
+                <label className="font-medium">Nombre</label>
                 <input
                   type="text"
                   {...registerCreate("nombre")}
@@ -166,15 +173,14 @@ console.log("URL:", `/expediente/${currentId}`);
             </form>
           </section>
 
-          {/* Tabla de Expedientes */}
+          {/* Seccion para lista de expedientes, editar y eliminar */}
           <section className="lg:col-span-2 bg-white rounded-xl shadow p-6">
             <h2 className="text-xl font-semibold mb-4">Lista de expedientes</h2>
 
-            {/* Luego aquí reemplazas con TanStack Query */}
             <table className="w-full border-collapse">
               <thead>
                 <tr className="bg-gray-200 text-left">
-                  <th className="p-3 font-medium">Título</th>
+                  <th className="p-3 font-medium">Nombre</th>
                   <th className="p-3 font-medium">Descripción</th>
                   <th className="p-3 font-medium">Estado</th>
                   <th className="p-3 font-medium w-32">Acciones</th>
@@ -182,31 +188,35 @@ console.log("URL:", `/expediente/${currentId}`);
               </thead>
 
               <tbody>
-                { data?.sort((a,b)=>a.id.localeCompare(b.id)).map((exp) => (
-                  <tr key={exp.id} className="border-b">
-                    <td className="p-3">{exp.nombre}</td>
-                    <td className="p-3">{exp.descripcion}</td>
-                    <td className="p-3">{exp.estado}</td>
-                    <td className="p-3 flex gap-2">
-                      <button
-                        className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600"
-                        onClick={() => openEditModal(exp, exp.id)}
-                      >
-                        Editar
-                      </button>
-                      <button
-                        className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
-                        onClick={() => handleDelete(exp.id)}
-                      >
-                        Eliminar
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                {data
+                  ?.sort((a, b) => a.nombre.localeCompare(b.nombre))
+                  .map((exp) => (
+                    <tr key={exp.id} className="border-b">
+                      <td className="p-3">{exp.nombre}</td>
+                      <td className="p-3">{exp.descripcion}</td>
+                      <td className="p-3">{exp.estado}</td>
+                      <td className="p-3 flex gap-2">
+                        <button
+                          className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+                          onClick={() => openEditModal(exp, exp.id)}
+                        >
+                          Editar
+                        </button>
+                        <button
+                          className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                          onClick={() => handleDelete(exp.id)}
+                        >
+                          Eliminar
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
           </section>
         </div>
+
+        {/* Modal para ediar expediente */}
         {isModalOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white p-6 rounded-xl w-full max-w-md shadow-lg">
@@ -273,9 +283,10 @@ console.log("URL:", `/expediente/${currentId}`);
                   </button>
                   <button
                     type="submit"
+                    disabled={isEditSubmitting}
                     className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
                   >
-                    Guardar
+                    {isEditSubmitting ? "Guardando..." : "Guardar"}
                   </button>
                 </div>
               </form>
@@ -283,6 +294,6 @@ console.log("URL:", `/expediente/${currentId}`);
           </div>
         )}
       </main>
-     </ProtectedPage>
+    </ProtectedPage>
   );
 }

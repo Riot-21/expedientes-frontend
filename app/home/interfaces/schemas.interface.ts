@@ -6,7 +6,7 @@ export const expedienteSchema = z.object({
   descripcion: z.string().nonempty("La descripción es obligatoria"),
 });
 
-// Schema para create expediente
+// Schema para editar expediente
 export const estadoOptions = ["PENDIENTE", "APROBADO", "RECHAZADO"] as const;
 export const editSchema = z.object({
   nombre: z.string().nonempty("El título es obligatorio"),
