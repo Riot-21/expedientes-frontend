@@ -1,4 +1,4 @@
-//fcomponente que muestra estado de carga
+//fcomponent que muestra estado de carga
 export const CustomFullScreenLoading = () => {
   return (
     <div className="flex h-screen w-screen items-center justify-center">

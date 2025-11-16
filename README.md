@@ -1,36 +1,33 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# App Expedientes - Frontend
 
-## Getting Started
+## Tecnologias / Librerias utilizadas
 
-First, run the development server:
+- **Axios:** Librería para realizar peticiones HTTP. Fue utilizada por su facilidad al manejar respuestas, interceptores, errores y cabeceras personalizadas.
 
-```bash
+- **TanStack Query:** Librería para el fetching de datos, caché automático, revalidación en segundo plano y manejo de errores. Se incluyó por su sencillez, eficiencia y por optimizar el consumo de APIs mediante las ``actions``.
+
+- **Zustand:** Librería ligera para el manejo de estado global. Se utilizó para gestionar el estado de autenticación debido a su simplicidad, rendimiento y capacidad para crear stores escalables.
+
+- **Sonner:** Librería de notificaciones modernas e interactivas. Fue integrada para mejorar la experiencia de usuario al mostrar mensajes de éxito, error y estados de la aplicación.
+
+- **Zod + React Hook Form:** Tecnologías utilizadas para el manejo y validación de datos en formularios. Permiten crear esquemas tipados, definir interfaces y asegurar que los campos enviados cumplan con las reglas definidas.
+
+## Instalacion y ejecucion 
+
+1. Clonar el repositorio
+````bash
+git clone https://github.com/Riot-21/expedientes-frontend.git
+````
+2. Instalar dependencias
+````
+npm install
+````
+3. Configurar variables de entrono para archivo ``.env`` (clonar ``.env.template``)
+````v
+NEXT_PUBLIC_API_URL= "url_backend"
+````
+
+4. Ejecutar proyecto
+````
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+````

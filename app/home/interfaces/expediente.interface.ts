@@ -1,3 +1,5 @@
+
+//interfaz para json de respuesta
 export interface ExpedienteResponse {
     id:          string;
     nombre:      string;

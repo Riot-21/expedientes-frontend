@@ -1,9 +1,9 @@
 import axios from "axios";
 import { useAuthStore } from "../login/store/auth.store";
 
-const API_URL = "http://localhost:8080/api";
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-//creacion de instancia axios para metodos que requieren toekn en el backend
+//creacion de instancia axios para metodos que requieren toekn
 const expApiJwt = axios.create({
   baseURL: API_URL,
 });

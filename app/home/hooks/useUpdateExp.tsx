@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateExpedienteAction } from "../actions/update-expediente.action";
 import { EditForm } from "../interfaces/schemas.interface";
 
+//custom hook con tansktack query para editar y actualizar un expediente
 export const useUpdateExp = () => {
   const queryClient = useQueryClient();
   const mutation = useMutation({
