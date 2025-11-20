@@ -31,3 +31,6 @@ NEXT_PUBLIC_API_URL= "url_backend"
 ````
 npm run dev
 ````
+
+5. Levantar backend y registrar un usuario para poder loguearse, ver pasos en:
+   ``https://github.com/Riot-21/expedientes-backend``
